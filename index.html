@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Cloud Pinger</title>
+        <meta
+            name="description"
+            content="Check ping times for major cloud providers: AWS, GCP, and Azure."
+        />
+        <meta name="keywords" content="Cloud, Ping, AWS, Microsoft Azure" />
+        <link rel="stylesheet" href="style.css" />
+        <script
+            src="https://unpkg.com/htmx.org@1.9.10"
+            integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            defer
+            src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+        ></script>
+    </head>
+    <body>
+        <header>
+            <h1>Welcome to Cloud Pinger</h1>
+            <p>
+                Check ping times for major cloud providers: AWS, GCP, and Azure.
+            </p>
+        </header>
+
+        <nav>
+            <a href="#aws">Amazon Web Services</a> |
+            <a href="#azure">Microsoft Azure</a> |
+            <a>Google Cloud Platform (Coming Soon)</a>
+        </nav>
+
+        <main>
+            <ul x-data="clouds">
+                <template x-for="cloud in clouds">
+                    <li :id="cloud.id">
+                        <h2 x-text="cloud.name"></h2>
+                        <table>
+                            <tr>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Latency</th>
+                            </tr>
+                            <template x-for="region in cloud.regions">
+                                <tr
+                                    :hx-get="region.url"
+                                    hx-trigger="every 3s queue:none"
+                                    hx-headers='{
+                                    "Cache-Control": "no-cache, no-store, must-revalidate",
+                                    "Pragma": "no-cache",
+                                    "Expires": "0"
+                                }'
+                                    :hx-target="'#' + $data.cloud.id + '-' + region.id + '-' + 'result'"
+                                    :id="$data.cloud.id + '-' + region.id"
+                                    hx-swap="none"
+                                >
+                                    <td x-text="region.id"></td>
+                                    <td x-text="region.label"></td>
+                                    <td
+                                        :id="$data.cloud.id + '-' + region.id + '-' + 'result'"
+                                    >
+                                        -
+                                    </td>
+                                </tr>
+                            </template>
+                        </table>
+                    </li>
+                </template>
+            </ul>
+        </main>
+
+        <footer>
+            <p>Copyright © 2023 Cloud Pinger</p>
+            <ul>
+                <li><a href="https://github.com/afdolriski">Github</a></li>
+            </ul>
+        </footer>
+        <script src="app.js"></script>
+        <script></script>
+    </body>
+</html>
